@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: yojnapath-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: QDRANT_URL
+        sync: false
+```
+
+**`Procfile`**:
+```
+web: uvicorn main:app --host 0.0.0.0 --port $PORT
+```
+
+**`.gitignore`**:
+```
+venv/
+__pycache__/
+*.pyc
+.env
+qdrant_storage/
+schemes_cleaned.json
+schemes_backup.json

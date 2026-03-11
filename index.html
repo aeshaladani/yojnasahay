@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YojnaSahay – Government Scheme Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Crimson+Pro:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --saffron: #FF9933;
+      --white:   #FFFFFF;
+      --green:   #138808;
+      --navy:    #000080;
+      --ashoka:  #0047AB;
+      --cream:   #FFF8F0;
+      --gold:    #C8922A;
+      --charcoal:#1a1a2e;
+      --muted:   #6b7280;
+      --border:  #e5e0d8;
+      --shadow:  rgba(0,0,71,0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--charcoal);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Tricolor top bar */
+    .tricolor-bar { display: flex; height: 6px; }
+    .tricolor-bar div { flex: 1; }
+    .tricolor-bar .t-saffron { background: var(--saffron); }
+    .tricolor-bar .t-white   { background: #f0f0f0; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+    .tricolor-bar .t-green   { background: var(--green); }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #000080 0%, #0a0a5e 60%, #000060 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 80% 50%, rgba(255,153,51,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 50%, rgba(19,136,8,0.06) 0%, transparent 60%);
+    }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .chakra-wrap {
+      width: 64px; height: 64px;
+      flex-shrink: 0;
+      animation: spin-slow 20s linear infinite;
+    }
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    .header-text h1 {
+      font-family: 'Crimson Pro', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+    }
+    .header-text h1 span { color: var(--saffron); }
+    .header-text p {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.65);
+      margin-top: 4px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .header-badge {
+      margin-left: auto;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 8px 14px;
+      text-align: center;
+    }
+    .header-badge .flag { font-size: 1.6rem; }
+    .header-badge p {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* Nav strip */
+    .nav-strip {
+      background: rgba(0,0,100,0.92);
+      border-bottom: 2px solid var(--saffron);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+    }
+    .nav-strip a {
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 0.78rem;
+      letter-spacing: 0.5px;
+      padding: 10px 16px;
+      display: block;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-strip a:hover, .nav-strip a.active {
+      color: #fff;
+      background: rgba(255,153,51,0.15);
+    }
+    .nav-new-chat {
+      margin-left: auto;
+      background: rgba(255,153,51,0.2) !important;
+      border-left: 1px solid rgba(255,255,255,0.1);
+      color: var(--saffron) !important;
+      font-weight: 500 !important;
+      cursor: pointer;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.5px;
+      padding: 10px 16px;
+      transition: background 0.2s;
+    }
+    .nav-new-chat:hover { background: rgba(255,153,51,0.35) !important; }
+
+    /* Main layout */
+    main {
+      flex: 1;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 24px 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Info banner */
+    .info-banner {
+      background: linear-gradient(90deg, #fff8f0, #fff);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--saffron);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Chat window */
+    #chat-window {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px 12px 0 0;
+      min-height: 420px;
+      max-height: 460px;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+    }
+    #chat-window::-webkit-scrollbar { width: 5px; }
+    #chat-window::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+    /* Messages */
+    .msg {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      animation: fadeUp 0.3s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .msg.user { flex-direction: row-reverse; }
+    .avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      font-weight: 600;
+    }
+    .avatar.bot  { background: linear-gradient(135deg, var(--navy), var(--ashoka)); color: #fff; font-size: 0.7rem; }
+    .avatar.user-av { background: linear-gradient(135deg, var(--saffron), #e67e22); color: #fff; }
+    .bubble {
+      max-width: 72%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      line-height: 1.65;
+    }
+    .msg.bot .bubble  { background: #f8f7ff; border: 1px solid #e8e6f0; border-top-left-radius: 4px; }
+    .msg.user .bubble { background: linear-gradient(135deg, var(--navy), #000060); color: #fff; border-top-right-radius: 4px; }
+
+    /* Typing indicator */
+    .typing-dots { display: flex; gap: 4px; padding: 4px 0; }
+    .typing-dots span {
+      width: 7px; height: 7px;
+      background: var(--ashoka);
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+      opacity: 0.6;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30%            { transform: translateY(-6px); }
+    }
+
+    /* Input area */
+    .input-area {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    #user-input {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      color: var(--charcoal);
+      background: var(--cream);
+      resize: none;
+      outline: none;
+      transition: border 0.2s;
+      min-height: 42px;
+      max-height: 120px;
+      line-height: 1.5;
+    }
+    #user-input:focus { border-color: var(--ashoka); background: #fff; }
+    #user-input::placeholder { color: #aaa; }
+
+    /* Mic button */
+    #mic-btn {
+      width: 42px; height: 42px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      position: relative;
+    }
+    #mic-btn:hover { border-color: var(--ashoka); background: #f0f4ff; }
+    #mic-btn.recording {
+      background: #fff0f0;
+      border-color: #e74c3c;
+      animation: pulse-red 1s infinite;
+    }
+    @keyframes pulse-red {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(231,76,60,0.4); }
+      50%       { box-shadow: 0 0 0 6px rgba(231,76,60,0); }
+    }
+    #mic-btn svg { width: 18px; height: 18px; }
+
+    /* Send button */
+    #send-btn {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--navy), var(--ashoka));
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    #send-btn:hover  { opacity: 0.9; transform: scale(1.05); }
+    #send-btn:active { transform: scale(0.97); }
+    #send-btn svg { width: 18px; height: 18px; fill: #fff; }
+
+    /* Mic status bar */
+    #mic-status {
+      display: none;
+      font-size: 0.75rem;
+      color: #e74c3c;
+      padding: 4px 0 0 4px;
+      align-items: center;
+      gap: 6px;
+    }
+    #mic-status.visible { display: flex; }
+    #mic-status .dot {
+      width: 7px; height: 7px;
+      background: #e74c3c;
+      border-radius: 50%;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.2; }
+    }
+
+    /* Welcome card */
+    .welcome-card {
+      background: linear-gradient(135deg, #f0f4ff, #fff8f0);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      text-align: center;
+    }
+    .welcome-card .wc-title {
+      font-family: 'Crimson Pro', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .welcome-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+    .welcome-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+    .chip {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 6px 14px;
+      font-size: 0.78rem;
+      color: var(--navy);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .chip:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+    .error-bubble {
+      background: #fff0f0;
+      border: 1px solid #fcc;
+      color: #c0392b;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 16px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--ashoka); text-decoration: none; }
+
+    @media (max-width: 600px) {
+      .header-text h1 { font-size: 1.4rem; }
+      .header-badge { display: none; }
+      .bubble { max-width: 88%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="tricolor-bar">
+  <div class="t-saffron"></div>
+  <div class="t-white"></div>
+  <div class="t-green"></div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <svg class="chakra-wrap" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="#4a90d9" stroke-width="3"/>
+      <circle cx="50" cy="50" r="8"  fill="none" stroke="#4a90d9" stroke-width="2.5"/>
+      <circle cx="50" cy="50" r="3"  fill="#4a90d9"/>
+      <g stroke="#4a90d9" stroke-width="1.8">
+        <line x1="50" y1="4"  x2="50" y2="42"/>
+        <line x1="50" y1="58" x2="50" y2="96"/>
+        <line x1="4"  y1="50" x2="42" y2="50"/>
+        <line x1="58" y1="50" x2="96" y2="50"/>
+        <line x1="17.2" y1="17.2" x2="44.3" y2="44.3"/>
+        <line x1="55.7" y1="55.7" x2="82.8" y2="82.8"/>
+        <line x1="82.8" y1="17.2" x2="55.7" y2="44.3"/>
+        <line x1="44.3" y1="55.7" x2="17.2" y2="82.8"/>
+        <line x1="50" y1="4"  x2="50" y2="42" transform="rotate(15  50 50)"/>
+        <line x1="50" y1="58" x2="50" y2="96" transform="rotate(15  50 50)"/>
+        <line x1="50" y1="4"  x2="50" y2="42" transform="rotate(30  50 50)"/>
+        <line x1="50" y1="58" x2="50" y2="96" transform="rotate(30  50 50)"/>
+        <line x1="50" y1="4"  x2="50" y2="42" transform="rotate(45  50 50)"/>
+        <line x1="50" y1="58" x2="50" y2="96" transform="rotate(45  50 50)"/>
+        <line x1="50" y1="4"  x2="50" y2="42" transform="rotate(60  50 50)"/>
+        <line x1="50" y1="58" x2="50" y2="96" transform="rotate(60  50 50)"/>
+        <line x1="50" y1="4"  x2="50" y2="42" transform="rotate(75  50 50)"/>
+        <line x1="50" y1="58" x2="50" y2="96" transform="rotate(75  50 50)"/>
+        <line x1="50" y1="4"  x2="50" y2="42" transform="rotate(105 50 50)"/>
+        <line x1="50" y1="58" x2="50" y2="96" transform="rotate(105 50 50)"/>
+        <line x1="50" y1="4"  x2="50" y2="42" transform="rotate(120 50 50)"/>
+        <line x1="50" y1="58" x2="50" y2="96" transform="rotate(120 50 50)"/>
+        <line x1="50" y1="4"  x2="50" y2="42" transform="rotate(135 50 50)"/>
+        <line x1="50" y1="58" x2="50" y2="96" transform="rotate(135 50 50)"/>
+        <line x1="50" y1="4"  x2="50" y2="42" transform="rotate(150 50 50)"/>
+        <line x1="50" y1="58" x2="50" y2="96" transform="rotate(150 50 50)"/>
+        <line x1="50" y1="4"  x2="50" y2="42" transform="rotate(165 50 50)"/>
+        <line x1="50" y1="58" x2="50" y2="96" transform="rotate(165 50 50)"/>
+      </g>
+    </svg>
+    <div class="header-text">
+      <h1>Yojna<span>Sahay</span></h1>
+      <p>Government Scheme Discovery Assistant &nbsp;|&nbsp; भारत सरकार</p>
+    </div>
+    <div class="header-badge">
+      <div class="flag">🇮🇳</div>
+      <p>India Gov</p>
+    </div>
+  </div>
+</header>
+
+<nav class="nav-strip">
+  <div class="nav-inner">
+    <a href="#" class="active">🏠 Home</a>
+    <a href="#">📋 All Schemes</a>
+    <a href="#">ℹ️ About</a>
+    <a href="#">📞 Help</a>
+    <button class="nav-new-chat" onclick="newChat()">✦ New Chat</button>
+  </div>
+</nav>
+
+<main>
+  <div class="info-banner">
+    <span>ℹ️</span>
+    <span>YojnaSahay helps you discover Central &amp; State government schemes. Type or <strong>speak</strong> in English or Hindi — click the 🎤 mic button to use voice.</span>
+  </div>
+
+  <div id="chat-window">
+    <div class="welcome-card" id="welcome-card">
+      <div class="wc-title">🙏 Namaste! Welcome to YojnaSahay</div>
+      <p>Tell me about yourself — your state, occupation, category, and income — and I'll find the best government schemes for you.<br>You can also <strong>speak</strong> using the mic button 🎤</p>
+      <div class="welcome-chips">
+        <div class="chip" onclick="sendChip(this)">I am a farmer in Bihar</div>
+        <div class="chip" onclick="sendChip(this)">B.Tech student, Gujarat, General category</div>
+        <div class="chip" onclick="sendChip(this)">Woman entrepreneur in Maharashtra</div>
+        <div class="chip" onclick="sendChip(this)">SC category worker in MP</div>
+        <div class="chip" onclick="sendChip(this)">मैं एक किसान हूँ, राजस्थान से</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 4px 0;">
+    <div id="mic-status">
+      <div class="dot"></div>
+      <span id="mic-status-text">Recording... speak now</span>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <textarea id="user-input" rows="1"
+      placeholder="Type your message... or click 🎤 to speak (English / Hindi)"
+      onkeydown="handleKey(event)"
+      oninput="autoResize(this)"></textarea>
+
+    <!-- Mic button -->
+    <button id="mic-btn" onclick="toggleRecording()" title="Click to start/stop recording">
+      <!-- Mic icon -->
+      <svg id="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="2" width="6" height="11" rx="3"/>
+        <path d="M5 10a7 7 0 0 0 14 0"/>
+        <line x1="12" y1="19" x2="12" y2="22"/>
+        <line x1="8"  y1="22" x2="16" y2="22"/>
+      </svg>
+    </button>
+
+    <!-- Send button -->
+    <button id="send-btn" onclick="sendMessage()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      </svg>
+    </button>
+  </div>
+</main>
+
+<footer>
+  YojnaSahay &nbsp;|&nbsp; Powered by AI + Whisper STT &nbsp;|&nbsp;
+  <a href="#">Privacy Policy</a> &nbsp;|&nbsp;
+  Data sourced from official government portals
+</footer>
+
+<script>
+  const API_BASE = "https://yojnasahay-api.onrender.com";
+  let conversationHistory = [];
+  let isLoading    = false;
+  let isRecording  = false;
+  let mediaRecorder = null;
+  let audioChunks  = [];
+
+  // Auto resize textarea 
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function sendChip(el) {
+    document.getElementById('user-input').value = el.textContent;
+    sendMessage();
+  }
+
+  // New chat
+  function newChat() {
+    conversationHistory = [];
+    document.getElementById('chat-window').innerHTML = `
+      <div class="welcome-card" id="welcome-card">
+        <div class="wc-title">🙏 Namaste! Welcome to YojnaSahay</div>
+        <p>Tell me about yourself — your state, occupation, category, and income — and I'll find the best government schemes for you.<br>You can also <strong>speak</strong> using the mic button 🎤</p>
+        <div class="welcome-chips">
+          <div class="chip" onclick="sendChip(this)">I am a farmer in Bihar</div>
+          <div class="chip" onclick="sendChip(this)">B.Tech student, Gujarat, General category</div>
+          <div class="chip" onclick="sendChip(this)">Woman entrepreneur in Maharashtra</div>
+          <div class="chip" onclick="sendChip(this)">SC category worker in MP</div>
+          <div class="chip" onclick="sendChip(this)">मैं एक किसान हूँ, राजस्थान से</div>
+        </div>
+      </div>`;
+  }
+
+  // Append message 
+  function appendMessage(role, text) {
+    const wc = document.getElementById('welcome-card');
+    if (wc) wc.remove();
+    const win = document.getElementById('chat-window');
+    const div = document.createElement('div');
+    div.className = `msg ${role}`;
+    const avatar = document.createElement('div');
+    avatar.className = `avatar ${role === 'user' ? 'user-av' : 'bot'}`;
+    avatar.textContent = role === 'user' ? '👤' : 'YP';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = formatText(text);
+    div.appendChild(avatar);
+    div.appendChild(bubble);
+    win.appendChild(div);
+    win.scrollTop = win.scrollHeight;
+  }
+
+  function formatText(text) {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+  }
+
+  function showTyping() {
+    const wc = document.getElementById('welcome-card');
+    if (wc) wc.remove();
+    const win = document.getElementById('chat-window');
+    const div = document.createElement('div');
+    div.className = 'msg bot';
+    div.id = 'typing-indicator';
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar bot';
+    avatar.textContent = 'YP';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+    div.appendChild(avatar);
+    div.appendChild(bubble);
+    win.appendChild(div);
+    win.scrollTop = win.scrollHeight;
+  }
+
+  function hideTyping() {
+    const t = document.getElementById('typing-indicator');
+    if (t) t.remove();
+  }
+
+  // Send message 
+  async function sendMessage() {
+    if (isLoading) return;
+    const input = document.getElementById('user-input');
+    const message = input.value.trim();
+    if (!message) return;
+    input.value = '';
+    input.style.height = 'auto';
+    appendMessage('user', message);
+    showTyping();
+    isLoading = true;
+    try {
+      const res = await fetch(`${API_BASE}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, conversation_history: conversationHistory })
+      });
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      const data = await res.json();
+      hideTyping();
+      appendMessage('bot', data.response);
+      conversationHistory = data.conversation_history.map(m => ({ role: m.role, content: m.content }));
+    } catch (err) {
+      hideTyping();
+      const errDiv = document.createElement('div');
+      errDiv.className = 'error-bubble';
+      errDiv.textContent = '⚠️ Could not connect to YojnaSahay server. Make sure the API is running on localhost:8000.';
+      document.getElementById('chat-window').appendChild(errDiv);
+      console.error(err);
+    } finally {
+      isLoading = false;
+      input.focus();
+    }
+  }
+
+  // Voice recording
+  async function toggleRecording() {
+    if (!isRecording) {
+      await startRecording();
+    } else {
+      stopRecording();
+    }
+  }
+
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) audioChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        // Stop all mic tracks
+        stream.getTracks().forEach(t => t.stop());
+        await transcribeAudio();
+      };
+
+      mediaRecorder.start();
+      isRecording = true;
+
+      // UI: recording state
+      document.getElementById('mic-btn').classList.add('recording');
+      document.getElementById('mic-btn').style.color = '#e74c3c';
+      document.getElementById('mic-status').classList.add('visible');
+      document.getElementById('mic-status-text').textContent = 'Recording... click 🎤 again to stop';
+
+    } catch (err) {
+      alert('Microphone access denied. Please allow microphone permission in your browser.');
+      console.error(err);
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+      isRecording = false;
+
+      // UI: processing state
+      document.getElementById('mic-btn').classList.remove('recording');
+      document.getElementById('mic-btn').style.color = '';
+      document.getElementById('mic-status-text').textContent = 'Processing audio...';
+    }
+  }
+
+  async function transcribeAudio() {
+    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+    const formData = new FormData();
+    formData.append('file', blob, 'recording.webm');
+
+    try {
+      const res = await fetch(`${API_BASE}/transcribe`, {
+        method: 'POST',
+        body: formData
+      });
+      if (!res.ok) throw new Error('Transcription failed');
+      const data = await res.json();
+
+      if (data.text && data.text.trim()) {
+        // Put transcribed text into input box and auto-send
+        document.getElementById('user-input').value = data.text.trim();
+        document.getElementById('mic-status').classList.remove('visible');
+        window.lastDetectedLang = data.language;
+        sendMessage();
+      } else {
+        document.getElementById('mic-status-text').textContent = 'No speech detected. Try again.';
+        setTimeout(() => document.getElementById('mic-status').classList.remove('visible'), 2500);
+      }
+    } catch (err) {
+      document.getElementById('mic-status-text').textContent = ' Transcription failed. Is the server running?';
+      setTimeout(() => document.getElementById('mic-status').classList.remove('visible'), 3000);
+      console.error(err);
+    }
+  }
+</script>
+</body>
+</html>

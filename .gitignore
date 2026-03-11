@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+.env
+qdrant_storage/
+schemes_cleaned.json
+schemes_backup.json
