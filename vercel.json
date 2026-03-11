@@ -1,15 +1,6 @@
 python -c "
-import json
-config = {
-    'version': 2,
-    'builds': [
-        {'src': 'index.html', 'use': '@vercel/static'}
-    ],
-    'routes': [
-        {'src': '/(.*)', 'dest': '/index.html'}
-    ]
-}
+content = '{}\n'
 with open('vercel.json', 'w', newline='\n', encoding='utf-8') as f:
-    json.dump(config, f, indent=2)
+    f.write(content)
 print('Done')
 "
