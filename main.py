@@ -2,7 +2,7 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
-import tempfile, os, shutil
+import tempfile, os, shutil, httpx
 from pipeline import chat
 from fastapi import Request
 from fastapi.responses import JSONResponse
@@ -18,7 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Whisper model (loaded once at startup)
+# Whisper model — lazy loaded, only used if Groq API fails
 whisper_model = None
 
 def get_whisper():
@@ -50,7 +50,7 @@ class TranscribeResponse(BaseModel):
 # Routes 
 @app.get("/")
 def root():
-    return {"status": "YojnaSahay API is running", "whisper": "ready"}
+    return {"status": "YojnaSahay API is running", "whisper": "groq-api"}
 
 @app.post("/chat", response_model=ChatResponse)
 def chat_endpoint(req: ChatRequest):
@@ -64,6 +64,7 @@ def chat_endpoint(req: ChatRequest):
         response=response_text,
         conversation_history=[Message(**m) for m in updated_history]
     )
+
 @app.options("/transcribe")
 async def transcribe_options(request: Request):
     return JSONResponse(
@@ -78,25 +79,47 @@ async def transcribe_options(request: Request):
 @app.post("/transcribe", response_model=TranscribeResponse)
 async def transcribe_audio(file: UploadFile = File(...)):
     """
-    Accepts an audio file (webm/wav/mp3),
-    transcribes it using faster-whisper,
-    returns the text and detected language.
+    Accepts an audio file (webm/wav/mp3).
+    Primary: Groq Whisper API (no RAM cost).
+    Fallback: local faster-whisper (only if Groq fails).
     """
-    # Save uploaded audio to a temp file
     suffix = os.path.splitext(file.filename)[-1] or ".webm"
+    audio_bytes = await file.read()
+
+    # ── PRIMARY: Groq Whisper API ──────────────────────────────────────────
+    groq_api_key = os.environ.get("GROQ_API_KEY")
+    if groq_api_key:
+        try:
+            async with httpx.AsyncClient(timeout=30) as client:
+                response = await client.post(
+                    "https://api.groq.com/openai/v1/audio/transcriptions",
+                    headers={"Authorization": f"Bearer {groq_api_key}"},
+                    files={"file": (file.filename or f"audio{suffix}", audio_bytes, "audio/webm")},
+                    data={"model": "whisper-large-v3", "language": "hi"}
+                )
+            if response.status_code == 200:
+                result = response.json()
+                text = result.get("text") or result.get("transcript") or ""
+                # Detect language: if Devanagari chars found → Hindi, else English
+                language = "hi" if any("\u0900" <= ch <= "\u097F" for ch in text) else "en"
+                return TranscribeResponse(text=text.strip(), language=language)
+            else:
+                print(f"Groq API error {response.status_code}: {response.text}")
+        except Exception as e:
+            print(f"Groq API failed, falling back to local Whisper: {e}")
+
+    # ── FALLBACK: local faster-whisper (only if Groq unavailable/failed) ──
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-        shutil.copyfileobj(file.file, tmp)
+        tmp.write(audio_bytes)
         tmp_path = tmp.name
 
     try:
         model = get_whisper()
-        # language=None lets Whisper auto-detect Hindi or English
         # First pass: detect language
         _, info = model.transcribe(tmp_path, beam_size=2, without_timestamps=True)
         detected_lang = info.language or "en"
 
         # Second pass: transcribe with correct language forced
-        # If Hindi detected, force Devanagari script output
         if detected_lang == "hi":
             segments, info = model.transcribe(
                 tmp_path,
@@ -104,7 +127,7 @@ async def transcribe_audio(file: UploadFile = File(...)):
                 beam_size=5,
                 task="transcribe",
                 without_timestamps=True,
-                initial_prompt="यह एक हिंदी वाक्य है।"  # primes Whisper to output Devanagari
+                initial_prompt="यह एक हिंदी वाक्य है।"
             )
         else:
             segments, info = model.transcribe(
@@ -116,12 +139,10 @@ async def transcribe_audio(file: UploadFile = File(...)):
             )
 
         text = " ".join(seg.text.strip() for seg in segments).strip()
-        language = detected_lang
-        return TranscribeResponse(text=text, language=language)
+        return TranscribeResponse(text=text, language=detected_lang)
     finally:
-        os.unlink(tmp_path)  # clean up temp file
+        os.unlink(tmp_path)
 
 @app.post("/reset")
 def reset():
     return {"message": "Send conversation_history: [] to start fresh."}
-
