@@ -15,7 +15,6 @@ faster-whisper==1.2.1
 tqdm==4.67.3
 requests==2.32.5
 httpx==0.28.1
-numpy==2.0.2
 huggingface-hub==0.36.2
 tokenizers==0.22.2
 transformers==4.57.6
