@@ -4,6 +4,8 @@ from pydantic import BaseModel
 from typing import List, Optional
 import tempfile, os, shutil
 from pipeline import chat
+from fastapi import Request
+from fastapi.responses import JSONResponse
 
 app = FastAPI(title="YojnaSahay API")
 
@@ -112,3 +114,14 @@ async def transcribe_audio(file: UploadFile = File(...)):
 @app.post("/reset")
 def reset():
     return {"message": "Send conversation_history: [] to start fresh."}
+
+@app.options("/transcribe")
+async def transcribe_options(request: Request):
+    return JSONResponse(
+        content={},
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        }
+    )
