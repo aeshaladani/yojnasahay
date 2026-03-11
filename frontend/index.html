@@ -518,7 +518,9 @@
 </footer>
 
 <script>
-  const API_BASE = "https://yojnasahay.onrender.com/";
+  const API_BASE = "https://yojnasahay.onrender.com";
+  // Wake up Render server on page load
+fetch(`${API_BASE}/`).catch(() => {});
   
   let conversationHistory = [];
   let isLoading    = false;
