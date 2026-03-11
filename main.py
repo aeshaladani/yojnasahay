@@ -13,7 +13,7 @@ app = FastAPI(title="YojnaSahay API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -63,6 +63,16 @@ def chat_endpoint(req: ChatRequest):
     return ChatResponse(
         response=response_text,
         conversation_history=[Message(**m) for m in updated_history]
+    )
+@app.options("/transcribe")
+async def transcribe_options(request: Request):
+    return JSONResponse(
+        content={},
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        }
     )
 
 @app.post("/transcribe", response_model=TranscribeResponse)
@@ -115,13 +125,3 @@ async def transcribe_audio(file: UploadFile = File(...)):
 def reset():
     return {"message": "Send conversation_history: [] to start fresh."}
 
-@app.options("/transcribe")
-async def transcribe_options(request: Request):
-    return JSONResponse(
-        content={},
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, OPTIONS",
-            "Access-Control-Allow-Headers": "*",
-        }
-    )
