@@ -1,6 +1,0 @@
-python -c "
-content = '{}\n'
-with open('vercel.json', 'w', newline='\n', encoding='utf-8') as f:
-    f.write(content)
-print('Done')
-"
