@@ -519,8 +519,20 @@
 
 <script>
   const API_BASE = "https://yojnasahay.onrender.com";
-  // Wake up Render server on page load
-fetch(`${API_BASE}/`).catch(() => {});
+
+  // Wake up Render server on page load — show banner if sleeping
+  (async () => {
+    try {
+      const res = await fetch(`${API_BASE}/`, { signal: AbortSignal.timeout(8000) });
+      if (res.ok) console.log("Server is awake.");
+    } catch {
+      // Server is cold-starting — show a banner
+      const banner = document.querySelector('.info-banner span:last-child');
+      if (banner) {
+        banner.innerHTML = '⏳ Server is waking up (free tier), please wait <strong>30–60 seconds</strong> then refresh or send a message...';
+      }
+    }
+  })();
   
   let conversationHistory = [];
   let isLoading    = false;
@@ -627,7 +639,8 @@ fetch(`${API_BASE}/`).catch(() => {});
       const res = await fetch(`${API_BASE}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, conversation_history: conversationHistory })
+        body: JSON.stringify({ message, conversation_history: conversationHistory }),
+        signal: AbortSignal.timeout(60000)   // 60s timeout for cold start
       });
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const data = await res.json();
@@ -638,7 +651,7 @@ fetch(`${API_BASE}/`).catch(() => {});
       hideTyping();
       const errDiv = document.createElement('div');
       errDiv.className = 'error-bubble';
-      errDiv.textContent = '⚠️ Could not connect to YojnaSahay server. Make sure the API is running on localhost:8000.';
+      errDiv.textContent = '⚠️ Could not connect to YojnaSahay server. The server may be starting up — please wait 30 seconds and try again.';
       document.getElementById('chat-window').appendChild(errDiv);
       console.error(err);
     } finally {
