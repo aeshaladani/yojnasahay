@@ -23,7 +23,15 @@ qdrant = QdrantClient(
     url=os.getenv("QDRANT_URL"),
     api_key=os.getenv("QDRANT_API_KEY")
 )
-embedder = SentenceTransformer("all-MiniLM-L6-v2")
+_embedder = None
+
+def get_embedder():
+    global _embedder
+    if _embedder is None:
+        print("Loading embedder...")
+        _embedder = SentenceTransformer("all-MiniLM-L6-v2")
+        print("Embedder loaded!")
+    return _embedder
 COLLECTION = "schemes"
 
 # State Definition 
@@ -140,7 +148,7 @@ def retrieve_schemes(state: AgentState) -> AgentState:
     if entities.get("caste"):      query_parts.append(entities["caste"])
     search_query = " ".join(query_parts)
 
-    query_vector = embedder.encode(search_query).tolist()
+    query_vector = get_embedder().encode(search_query).tolist()
 
     # Build state filter
     search_filter = None
