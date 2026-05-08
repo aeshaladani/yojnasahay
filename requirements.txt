@@ -10,4 +10,3 @@ langchain-groq
 langgraph
 groq
 httpx
-huggingface-hub-0.36.2
