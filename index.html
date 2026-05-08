@@ -509,8 +509,6 @@
   </div>
 </main>
 
-
-
 <footer>
   YojnaSahay &nbsp;|&nbsp; Powered by AI + Whisper STT &nbsp;|&nbsp;
   <a href="#">Privacy Policy</a> &nbsp;|&nbsp;
@@ -518,21 +516,7 @@
 </footer>
 
 <script>
-  const API_BASE = "http://localhost:8000";
-
-  // Wake up Render server on page load — show banner if sleeping
-  (async () => {
-    try {
-      const res = await fetch(`${API_BASE}/`, { signal: AbortSignal.timeout(8000) });
-      if (res.ok) console.log("Server is awake.");
-    } catch {
-      // Server is cold-starting — show a banner
-      const banner = document.querySelector('.info-banner span:last-child');
-      if (banner) {
-        banner.innerHTML = '⏳ Server is waking up (free tier), please wait <strong>30–60 seconds</strong> then refresh or send a message...';
-      }
-    }
-  })();
+  const API_BASE = "https://yojnasahay.onrender.com/";
   
   let conversationHistory = [];
   let isLoading    = false;
@@ -584,7 +568,7 @@
     div.className = `msg ${role}`;
     const avatar = document.createElement('div');
     avatar.className = `avatar ${role === 'user' ? 'user-av' : 'bot'}`;
-    avatar.textContent = role === 'user' ? '👤' : 'YS';
+    avatar.textContent = role === 'user' ? '👤' : 'YP';
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
     bubble.innerHTML = formatText(text);
@@ -609,7 +593,7 @@
     div.id = 'typing-indicator';
     const avatar = document.createElement('div');
     avatar.className = 'avatar bot';
-    avatar.textContent = 'YS';
+    avatar.textContent = 'YP';
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
     bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
@@ -639,8 +623,7 @@
       const res = await fetch(`${API_BASE}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, conversation_history: conversationHistory }),
-        signal: AbortSignal.timeout(60000)   // 60s timeout for cold start
+        body: JSON.stringify({ message, conversation_history: conversationHistory })
       });
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const data = await res.json();
@@ -651,7 +634,7 @@
       hideTyping();
       const errDiv = document.createElement('div');
       errDiv.className = 'error-bubble';
-      errDiv.textContent = '⚠️ Could not connect to YojnaSahay server. The server may be starting up — please wait 30 seconds and try again.';
+      errDiv.textContent = '⚠️ Could not connect to YojnaSahay server. Make sure the API is running on localhost:8000.';
       document.getElementById('chat-window').appendChild(errDiv);
       console.error(err);
     } finally {

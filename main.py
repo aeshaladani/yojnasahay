@@ -2,7 +2,6 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
-import tempfile, os, shutil, httpx
 from pipeline import chat
 from fastapi import Request
 from fastapi.responses import JSONResponse
