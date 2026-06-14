@@ -24,17 +24,17 @@ YojnaSahay helps Indian citizens discover government schemes they are eligible f
 ## 🏗️ Architecture
 
 ```
-┌─────────────┐      ┌──────────────┐      ┌─────────────┐
+┌─────────────┐        ┌──────────────┐        ┌─────────────┐
 │  Frontend    │ ───▶ │   FastAPI     │ ───▶ │  LangGraph   │
-│  (Vercel)    │      │   Backend     │      │   Pipeline   │
+│  (Vercel)    │       │   Backend     │      │   Pipeline   │
 │  index.html  │ ◀─── │   (Render)    │ ◀─── │              │
-└─────────────┘      └──────────────┘      └──────┬───────┘
+└─────────────┘        └──────────────┘       └──────┬───────┘
                              │                      │
                              ▼                      ▼
-                     ┌──────────────┐      ┌─────────────┐
+                     ┌──────────────┐       ┌─────────────┐
                      │  Groq Whisper │      │   Qdrant     │
                      │  (Voice STT)  │      │  Vector DB   │
-                     └──────────────┘      │  (3400 schemes)│
+                     └──────────────┘       │(3400 schemes)│
                                             └─────────────┘
                                                     │
                                                     ▼
