@@ -4,7 +4,7 @@
 
 YojnaSahay helps Indian citizens discover government schemes they are eligible for, through a conversational chatbot that supports both **Hindi and English**, including **voice input**.
 
-🔗 **Live Demo:** [yojnasahay-z63o.vercel.app](https://yojnasahay-z63o.vercel.app)
+🔗 **Live Demo:** [yojnasahay-4c64.vercel.app](https://yojnasahay-4c64.vercel.app)
 🔗 **API:** [yojnasahay.onrender.com](https://yojnasahay.onrender.com)
 
 ---
