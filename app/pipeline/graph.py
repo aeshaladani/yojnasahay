@@ -6,6 +6,11 @@ from app.pipeline.nodes.clarification import check_clarification
 from app.pipeline.nodes.retrieval import retrieve_schemes
 from app.pipeline.nodes.response import generate_response
 
+def route_after_intent(state):
+    if state.get("intent") in ["translate", "general"]:
+        return "generate_response"
+    return "extract_entities"
+
 def build_pipeline():
     graph = StateGraph(AgentState)
 
@@ -16,7 +21,18 @@ def build_pipeline():
     graph.add_node("generate_response",   generate_response)
 
     graph.set_entry_point("detect_intent")
-    graph.add_edge("detect_intent",       "extract_entities")
+
+    # Conditional edge after intent detection
+    graph.add_conditional_edges(
+        "detect_intent",
+        route_after_intent,
+        {
+            "generate_response": "generate_response",
+            "extract_entities":  "extract_entities"
+        }
+    )
+
+    # Normal flow for find_scheme / get_details / eligibility_check
     graph.add_edge("extract_entities",    "check_clarification")
     graph.add_edge("check_clarification", "retrieve_schemes")
     graph.add_edge("retrieve_schemes",    "generate_response")
